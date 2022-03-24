@@ -1,0 +1,105 @@
+---
+title: "Case Study competition"
+author: "Thomas Farrell"
+date: "3/23/2022"
+output: pdf_document
+toc : true
+font size: 12pt
+---
+## Cover Page
+
+Report by:Thomas Farrell, Leo Salazar, Mia Brito, Raneen Aljamal
+
+
+Primary Contact : Thomas Farrell (512) 400-9580
+
+\newpage
+
+
+## Executive Summary
+|       This data set is collected directly from a fundraising agency and contains 95,412 records broken into 142 fields. The models shown related the efficiency of the different variables to predict if a consumer will donate to the campaign and if they donate it will predict how much they are likely to donate. We will use three different modeling techniques Linear Regression, Linear discriminant analysis(LDA) and Decision Tree modeling.
+
+## Data Anlaysis
+
+
+
+## Modeling Approaches
+
+
+
+## Results
+
+
+
+## Conclusions and Recommendations
+
+
+\newpage
+
+## Appendix
+
+### Loading in libraries
+```{r setup, message=FALSE, echo=TRUE}
+library(titanic)
+library(caret)
+library(lattice)
+library(ggplot2)
+library(gam)
+library(car)
+library(ROCR)
+library(ggmosaic)
+library(prettydoc)
+library(tinytex)
+library(corrplot)
+library(MASS)
+library(tidyverse)
+library(esquisse)
+library(lubridate)
+source('/Users/thomasfarrell/Downloads/optim_threshold.R')
+
+```
+
+
+### Reading in data
+
+
+```{r}
+b1 = read.csv("/Users/thomasfarrell/Downloads/Customer_Analytics_TrainTest.csv", sep = ",")
+```
+
+
+### Changing character variables to factors
+
+```{r}
+b1$State = as.factor(b1$State)
+b1$NeighborhoodCode = as.factor(b1$NeighborhoodCode)
+b1$Gender = as.factor(b1$Gender)
+b1 = subset(b1, !is.na(b1$Age))
+b1 = subset(b1, !is.na(b1$NumberOfChild))
+b1 = subset(b1, !is.na(b1$Income))
+str(b1)
+```
+
+
+### Removing highly correlated variables
+
+```{r}
+b1_num = dplyr::select_if(b1, is.numeric)
+M = cor(b1_num)
+highcorr = findCorrelation(M, cutoff = .9, names = TRUE)
+b1 = dplyr::select(b1, - highcorr)
+
+```
+
+
+### Checking summary of target variable
+
+```{r}
+summary(b1$DateOfFirstGift)
+```
+
+
+```{r}
+
+```
+
