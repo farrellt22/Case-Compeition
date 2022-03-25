@@ -74,6 +74,7 @@ b1 = read.csv("/Users/thomasfarrell/Downloads/Customer_Analytics_TrainTest.csv",
 b1$State = as.factor(b1$State)
 b1$NeighborhoodCode = as.factor(b1$NeighborhoodCode)
 b1$Gender = as.factor(b1$Gender)
+b1$Donation = as.factor(b1$Donation)
 b1 = subset(b1, !is.na(b1$Age))
 b1 = subset(b1, !is.na(b1$NumberOfChild))
 b1 = subset(b1, !is.na(b1$Income))
@@ -95,11 +96,28 @@ b1 = dplyr::select(b1, - highcorr)
 ### Checking summary of target variable
 
 ```{r}
-summary(b1$DateOfFirstGift)
+summary(b1$Donation)
 ```
 
 
 ```{r}
+set.seed(1)
+tr_ind = sample(nrow(b1),.8*nrow(b1), replace = F)
+b1train = b1[tr_ind,]
+b1test = b1[-tr_ind,]
+```
+
+
+```{r}
+a1 = glm(formula = Donation ~ . , data = b1 , family = binomial)
+
+
+vif(a1)
+summary(a1)
+
+predprob = predict.glm(a1, newdata = b1test, type = "response")
+predclass_log = ifelse(predprob >= .1, "1", "0")
+caret::confusionMatrix(as.factor(predclass_log), as.factor(b1test$Donation), positive = "1")
 
 ```
 
