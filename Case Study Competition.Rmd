@@ -124,6 +124,7 @@ b1 = dplyr::select(b1, - LangEng)
 b1 = dplyr::select(b1, - LangSpa)
 b1 = dplyr::select(b1, - LangAs)
 b1 = dplyr::select(b1, - LangOth)
+b1 = dplyr::select(b1, - AmDonated)
 str(b1)
 ```
 
@@ -163,8 +164,24 @@ vif(a1)
 summary(a1)
 
 predprob = predict.glm(a1, newdata = b1test, type = "response")
-predclass_log = ifelse(predprob >= .1, "1", "0")
+predclass_log = ifelse(predprob >= .05, "1", "0")
 caret::confusionMatrix(as.factor(predclass_log), as.factor(b1test$Donation), positive = "1")
 
+```
+
+
+```{r}
+optim_threshold(a1,b1, b1$Donation)
+```
+
+
+
+### LDA Model
+
+
+```{r}
+m1.lda = lda(formula = Donation ~., data = b1train)
+predclass_lda = predict(m1.lda, newdata = b1test)
+caret::confusionMatrix(as.factor(predclass_lda),as.factor(b1test$Donation), positive = "1")
 ```
 
