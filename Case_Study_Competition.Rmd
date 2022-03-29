@@ -19,7 +19,7 @@ Primary Contact : Thomas Farrell (512) 400-9580
 ## Executive Summary
 |       This data set is collected directly from a fundraising agency and contains 95,412 records broken into 142 fields. The models shown related the efficiency of the different variables to predict if a consumer will donate to the campaign and if they donate it will predict how much they are likely to donate. We will use three different modeling techniques Linear Regression, Linear discriminant analysis(LDA) and Decision Tree modeling.
 
-## Data Anlaysis
+## Data Anlaysis (Methodology)
 
 
 
@@ -40,12 +40,12 @@ Primary Contact : Thomas Farrell (512) 400-9580
 
 ### Loading in libraries
 ```{r setup, message=FALSE, echo=TRUE}
-library(titanic)
+library(varImp)
 library(caret)
 library(lattice)
 library(ggplot2)
 library(gam)
-library(car)
+library(caret)
 library(ROCR)
 library(ggmosaic)
 library(prettydoc)
@@ -56,6 +56,8 @@ library(tidyverse)
 library(esquisse)
 library(lubridate)
 library(modeldata)
+library(leaps)
+library(randomForest)
 source('/Users/thomasfarrell/Downloads/optim_threshold.R')
 
 ```
@@ -67,6 +69,7 @@ source('/Users/thomasfarrell/Downloads/optim_threshold.R')
 ```{r}
 b1 = read.csv("/Users/thomasfarrell/Downloads/Customer_Analytics_TrainTest.csv", sep = ",")
 ```
+
 
 
 ### Changing character variables to factors
@@ -125,6 +128,10 @@ b1 = dplyr::select(b1, - LangSpa)
 b1 = dplyr::select(b1, - LangAs)
 b1 = dplyr::select(b1, - LangOth)
 b1 = dplyr::select(b1, - AmDonated)
+b1 = dplyr::select(b1, - NumberOfChild)
+b1 = dplyr::select(b1, - PercEmpState)
+
+
 str(b1)
 ```
 
@@ -160,7 +167,7 @@ b1test = b1[-tr_ind,]
 a1 = glm(formula = Donation ~ . , data = b1 , family = binomial)
 
 
-vif(a1)
+car::vif(a1)
 summary(a1)
 
 predprob = predict.glm(a1, newdata = b1test, type = "response")
@@ -168,6 +175,26 @@ predclass_log = ifelse(predprob >= .05, "1", "0")
 caret::confusionMatrix(as.factor(predclass_log), as.factor(b1test$Donation), positive = "1")
 
 ```
+
+
+## Results
+
+### Logistic Regression
+
+
+```{r}
+a1 = glm(formula = Donation ~ NeighborhoodCode + PercJapa + PercChin + AvgRent + IC3H + LFAF + MaxDol + LastDol, data = b1 , family = binomial)
+
+
+car::vif(a1)
+summary(a1)
+
+predprob = predict.glm(a1, newdata = b1test, type = "response")
+predclass_log = ifelse(predprob >= .05, "1", "0")
+caret::confusionMatrix(as.factor(predclass_log), as.factor(b1test$Donation), positive = "1")
+```
+
+
 
 
 ```{r}
@@ -178,10 +205,23 @@ optim_threshold(a1,b1, b1$Donation)
 
 
 
+
 ### LDA Model
 
 
 ```{r}
+m1.lda = lda(formula = Donation ~NeighborhoodCode + PercJapa + PercChin + AvgRent + IC3H + LFAF + MaxDol + LastDol, data = b1train)
+predclass_lda = predict(m1.lda, newdata = b1test)
+caret::confusionMatrix(as.factor(predclass_lda),as.factor(b1test$Donation), positive = "1")
+```
 
+
+
+
+### Decision Tree
+
+
+```{r}
+str(b1)
 ```
 
