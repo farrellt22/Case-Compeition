@@ -20,7 +20,220 @@ Primary Contact : Thomas Farrell (512) 400-9580
 |       This data set is collected directly from a fundraising agency and contains 95,412 records broken into 142 fields. The models shown related the efficiency of the different variables to predict if a consumer will donate to the campaign and if they donate it will predict how much they are likely to donate. We will use three different modeling techniques Linear Regression, Linear discriminant analysis(LDA) and Decision Tree modeling.
 
 ## Data Anlaysis (Methodology)
+Variable                    Description
+--------------------------  ------------------------------------------
+DateOfFirstGift             Origin Date. Date of donor's first gift
+			    (YYMM). 
+                           
+State                       State abbreviation 
+Zip                         Zipcode 
+                           
+DOB                         Date of birth (YYMM)
+			     0 is missing
 
+NeighborhoodCode
+1st byte                      U=Urban
+                              C=City
+                              S=Suburban
+                              T=Town
+                              R=Rural
+                           
+2nd byte = Socio-Economic status of the neighborhood
+                              1 = Highest SES
+                              2 = Average SES
+                              3 = Lowest SES 
+(except for Urban communities, where 
+                                  1 = Highest SES, 2 = Above average SES, 
+                                  3 = Below average SES, 4 = Lowest SES.)                            
+                          
+Age                         Age 
+                            empty if DOB = 0                           
+                           
+Home	                    Home Owner Flag
+                            1 = Home owner 
+                            0 = Unknown/Not home-owner
+                        
+NumberOfChildren            NUMBER OF CHILDREN 
+			     empty implies no children
+ 
+Income                      HOUSEHOLD INCOME in ten housands (10,000s)/yr.
+			     empty means missing data
+
+Gender                      Gender
+                            M = Male
+                            F = Female
+                            U = Unknown
+                            J = Joint Account, unknown gender
+                          
+PercVets                    % Males Veterans
+PercEmpLoc                  % Employed by Local Gov
+PercEmpState                % Employed by State Gov
+PercEmpFed                  % Employed by Fed Gov
+                           
+--------------------------  -------------------------------------------------
+The following variables reflect characteristics of the donors neighborhood, as collected from Census data.
+                           
+Persons                     Number of Persons
+Fams                        Number of Families
+Households                  Number of Households
+PercPopUrban                Percent Population in Urbanized Area
+PercPopRural                Percent Population Inside Rural Area
+PercMale                    Percent Male
+PercFemale                  Percent Female
+PercWhite                   Percent White
+PercBlack                   Percent Black
+PercNatAm                   Percent Native American
+PercIsleAsian               Percent Pacific Islander/Asian
+PercHisp                    Percent Hispanic
+PercAsianInd                Percent Asian Indian
+PercJapa                    Percent Japanese
+PercChin                    Percent Chinese
+PercPhil                    Percent Pilipino
+PercKor                     Percent Korean
+PercViet                    Percent Vietnamese
+PercHaw                     Percent Hawaiian
+PercMex                     Percent Mexican
+PercPurRic                  Percent Puerto Rican
+PercCuba                    Percent Cuban
+
+MedAge                      Median Age of Population
+AvgAge                      Average Age of Population
+AgeC1                       Percent Adults Age18-24
+AgeC2                       Percent Adults Age 25-34
+AgeC3                       Percent Adults Age 35-44
+AgeC4                       Percent Adults Age 45-54
+AgeC5                       Percent Adults Age 55-64
+AgeC6                       Percent Adults Age 65-74
+AgeC7                       Percent Adults Age >= 75
+
+ChildC1                     Percent Children Age <=2
+ChildC2                     Percent Children Age 3-5
+ChildC3                     Percent Children Age 6-11
+
+PercElder                   Percent Households w/ Person 65+ Living Alone
+
+HHN1                        Percent 1 Person Households
+HHN2                        Percent 2 Person Households
+HHN3                        Percent 3 or More Person Households
+HHN4                        Percent 4 or More Person Households
+HHN5                        Percent 5 or More Person Households
+HHN6                        Percent 6 Person Households
+
+PercMarr                    Percent Married
+PercSepDiv                  Percent Separated or Divorced
+PercWid                     Percent Widowed
+PercSingle                  Percent Never Married
+
+MedHomeVal                  Median Home Value in hundreds
+AvgHomeVal                  Average Home Value in hundreds
+
+MedRent                     Median Rent in hundreds
+AvgRent                     Average Rent in hundreds
+
+MedHousInc                  Median Household Income in hundreds
+MedFamInc                   Median Family Income in hundreds
+AvgHousInc                  Average Household Income in hundreds
+AvgFamInc                   Average Family Income in hundreds
+PerCapInc                   Per Capita Income
+
+IC1H                        Percent Households w/ Income < $15,000
+IC2H                        Percent Households w/ Income $15,000 - $24,999
+IC3H                        Percent Households w/ Income $25,000 - $34,999
+IC4H                        Percent Households w/ Income $35,000 - $49,999
+IC5H                        Percent Households w/ Income $50,000 - $74,999
+IC6H                        Percent Households w/ Income $75,000 - $99,999
+IC7H                        Percent Households w/ Income $100,000 - $124,999
+IC8H                        Percent Households w/ Income $125,000 - $149,999
+IC9H                        Percent Households w/ Income >= $150,000
+
+IC1F                        Percent Families w/ Income < $15,000
+IC2F                        Percent Families w/ Income $15,000 - $24,999
+IC3F                        Percent Families w/ Income $25,000 - 34,999
+IC4F                        Percent Families w/ Income $35,000 - $49,999
+IC5F                        Percent Families w/ Income $50,000 - $74,999
+IC6F                        Percent Families w/ Income $75,000 - $99,999
+IC7F                        Percent Families w/ Income $100,000 - $124,999
+IC8F                        Percent Families w/ Income $125,000 - $149,999
+IC9F                        Percent Families w/ Income >= $150,000
+PercSocSec                  Percent Households on Social Security
+
+LFA                         Percent Adults in Labor Force
+LFAM                        Percent Adult Males in Labor Force
+LFAF                        Percent Females in Labor Force
+LFAMEmp                     Percent Adult Males Employed
+LFAFEMp                     Percent Adult Females Employed
+
+PercProf                    Percent Professional
+PercManage                  Percent Managerial
+PercTech                    Percent Technical
+PercSales                   Percent Sales
+PercCler                    Percent Clerical/Administrative Support
+PercFarm                    Percent Farmers
+PercCraft                   Percent Craftsmen, Precision, Repair
+PercMech                    Percent Operatives, Machine
+PercTran                    Percent Transportation
+PercLab                     Percent Laborers, Handlers, Helpers
+
+EMP1                        Percent Employed in Agriculture
+EMP2                        Percent Employed in Mining
+EMP3                        Percent Employed in Construction
+EMP4                        Percent Employed in Manufacturing
+EMP5                        Percent Employed in Transportation
+EMP6                        Percent Employed in Communications
+EMP7                        Percent Employed in Wholesale Trade
+EMP8                        Percent Employed in Retail Industry
+EMP9                        Percent Employed in Finance, Insurance, R-Estate
+EMP10                       Percent Employed in Business and Repair
+EMP11                       Percent Employed in Personal Services
+EMP12                       Percent Employed in Entertainment and Recreation
+EMP13                       Percent Employed in Health Services
+EMP14                       Percent Employed in Educational Services
+EMP15                       Percent Employed in Other Professional Services
+EMP16                       Percent Employed in Public Administration
+
+MedEdu                      Median Years of School Completed by Adults 25+
+
+Edu1                        Percent Adults 25+ Grades 0-8
+Edu2                        Percent Adults 25+ w/ some High School
+Edu3                        Percent Adults 25+ Completed High School 
+Edu4                        Percent Adults 25+ w/ some College
+Edu5                        Percent Adults 25+ w/ Associates Degree
+Edu6                        Percent Adults 25+ w/ Bachelors Degree
+Edu7                        Percent Adults 25+ Graduate Degree
+
+PercForgnBr                 Percent Foreign Born
+PercStateBr                 Percent Born in State of Residence
+
+LangEng                     Percent English Only Speaking
+LangSpa                     Percent Spanish Speaking
+LangAs                      Percent Asian Speaking
+LangOth                     Percent Other Language Speaking
+
+
+--------------------------  -------------------------------------------------
+The following fields are summary variables from the donation history file. 
+
+LifeGiftDol                 Dollar amount of lifetime gifts to date
+LifeGiftNum                 Number of lifetime gifts to date
+LifeGiftPromNum             Number of lifetime gifts to promotions to date 
+MinDol                      Dollar amount of smallest gift to date               
+MaxDol                      Dollar amount of largest gift to date              
+LastDol                     Dollar amount of most recent gift            
+AvgDol                      Average dollar amount of gifts to date           
+
+--------------------------  -------------------------------------------------
+CustID                      Control number (unique record identifier)
+
+Donation                    Target Variable: Binary Indicator for donation
+AmDonated                   Target Variable: Donation Amount (in $) 
+--------------------------  -------------------------------------------------
+
+
+
+
+```{r}
+
+```
 
 
 ## Modeling Approaches
@@ -212,7 +425,7 @@ optim_threshold(a1,b1, b1$Donation)
 ```{r}
 m1.lda = lda(formula = Donation ~NeighborhoodCode + PercJapa + PercChin + AvgRent + IC3H + LFAF + MaxDol + LastDol, data = b1train)
 predclass_lda = predict(m1.lda, newdata = b1test)
-caret::confusionMatrix(as.factor(predclass_lda),as.factor(b1test$Donation), positive = "1")
+caret::confusionMatrix(as.factor(predclass_lda$class),as.factor(b1test$Donation), positive = "1")
 ```
 
 
