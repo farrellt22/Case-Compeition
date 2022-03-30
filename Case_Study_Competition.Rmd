@@ -5,6 +5,8 @@ date: "3/23/2022"
 output: pdf_document
 toc : true
 font size: 12pt
+
+bibliography: citations.bib
 ---
 ## Cover Page
 
@@ -18,6 +20,15 @@ Primary Contact : Thomas Farrell (512) 400-9580
 
 ## Executive Summary
 |       This data set is collected directly from a fundraising agency and contains 95,412 records broken into 142 fields. The models shown related the efficiency of the different variables to predict if a consumer will donate to the campaign and if they donate it will predict how much they are likely to donate. We will use three different modeling techniques Linear Regression, Linear discriminant analysis(LDA) and Decision Tree modeling.
+
+## Related Literature: 
+
+When it comes to modeling approaches, it is crucial to pick the method that best satisfies your data’s needs. My team members and I have dove into the different types of modeling approaches to explore which method best fits our research. In our past case studies, we first explored logistic regression. As previously mentioned, Mitchell Dayton explains how logistic regression tackles the process of classifying problems. We also explored the use of a linear regression method. We learned that linear regression more commonly handles regression problems. To further enhance our knowledge of the different types of modeling approaches, we will be exploring the use of LDA and Decision Tree models in this case study.
+Linear Discriminant Analysis, LDA, is another common modeling approach. LDA is commonly used to find a linear combination to separate more than two subjects or events. In Ricciardi, Valente, Edmund, Cantoni, Green, Fiorillo, Picone, Santini, and Cesarelli’s work, they used the LDA model to explore the use of a data mining technique to help clinicians in decision-making when it comes to Coronary Artery Disease. As previously mentioned, LDA models are used to separate two or more subjects. In this case study, they used the LDA model to classify the patients to help aid the decision making process. They concluded that this accelerated and enhanced the decision making process for doctors to choose the correct treatment for their patient. 
+|       Similar to an LDA model, a Decision Tree model is used for classification purposes. A Decision Tree model builds regression by creating a model in a tree-like structure. It essentially makes the data set smaller by breaking it down into smaller subsets for an easier and quicker read. Stretch, Soares, and Moreira explored the use of a Decision Tree model when predicting the failure of students in University courses. They used the Decision Tree model to narrow down their data and make it smaller and were able to successfully explain the drop out phenomenon. 
+
+
+
 
 ## Data Anlaysis (Methodology)
 Variable                    Description
@@ -229,11 +240,12 @@ AmDonated                   Target Variable: Donation Amount (in $)
 --------------------------  -------------------------------------------------
 
 
+[@log1][@log2][@log3][@log4]
 
 
-```{r}
 
-```
+
+
 
 
 ## Modeling Approaches
@@ -392,6 +404,7 @@ caret::confusionMatrix(as.factor(predclass_log), as.factor(b1test$Donation), pos
 
 ## Results
 
+
 ### Logistic Regression
 
 
@@ -403,7 +416,7 @@ car::vif(a1)
 summary(a1)
 
 predprob = predict.glm(a1, newdata = b1test, type = "response")
-predclass_log = ifelse(predprob >= .05, "1", "0")
+predclass_log = ifelse(predprob >= .1, "1", "0")
 caret::confusionMatrix(as.factor(predclass_log), as.factor(b1test$Donation), positive = "1")
 ```
 
@@ -415,6 +428,13 @@ optim_threshold(a1,b1, b1$Donation)
 ```
 
 
+```{r}
+m2.log = step(a1, direction = "backward")
+summary(m2.log)
+
+car::vif(m2.log)
+```
+
 
 
 
@@ -423,9 +443,9 @@ optim_threshold(a1,b1, b1$Donation)
 
 
 ```{r}
-m1.lda = lda(formula = Donation ~NeighborhoodCode + PercJapa + PercChin + AvgRent + IC3H + LFAF + MaxDol + LastDol, data = b1train)
+m1.lda = lda(formula = Donation ~ PercJapa + PercChin + IC3H + LFAF + LastDol, data = b1train)
 predclass_lda = predict(m1.lda, newdata = b1test)
-caret::confusionMatrix(as.factor(predclass_lda$class),as.factor(b1test$Donation), positive = "1")
+caret::confusionMatrix(as.factor(predclass_lda$class),as.factor(b1test$Donation), positive = "1") 
 ```
 
 
@@ -435,6 +455,21 @@ caret::confusionMatrix(as.factor(predclass_lda$class),as.factor(b1test$Donation)
 
 
 ```{r}
-str(b1)
+library(rpart.plot)
+library(rpart)
+library(caTools)
+set.seed(123)
+split = sample.split(b1$Donation, SplitRatio = 0.8)
+b1train = subset(b1, split == TRUE)
+b1test = subset(b1, split == FALSE)
+
+tree.b1train <- rpart(formula = Donation ~ NeighborhoodCode + PercJapa + PercChin + AvgRent + IC3H + LFAF + MaxDol + LastDol,
+                       data = b1train,control =rpart.control(minsplit =150,minbucket=1,cp=0))
+
+rpart.plot(tree.b1train)                     
+```
+
+```{r}
+summary(tree.b1train)
 ```
 
