@@ -38,8 +38,12 @@ The main question to be answered is what type of individual will most likely don
 ## Data Anlaysis (Methodology)
 
 
+|        Once we defined our variables in the data set, we changed all of our character variables to factor variables. We then created graphic models of significant variables in our data. This allowed us to visually see what people in our data could be beneficial as we could see which demographics may donate. When making our graphic representations we had to include Donation as the fill for the bar chart or histogram. For the Categorical variables we decided to use a Bar chart to best represent our data. The fill of the "Donation" variable allowed us to show the relationship between the variable and if they would choose to make a Donation or not.
 
-|        Once we defined our variables in the data set, we changed all of our character variables to factor variables. We then created graphic models of significant variables in our data. This allowed us to visually see what people in our data could be beneficial to market to. When making our graphic representations we had to include Y as the fill for the bar chart or histogram. For the Categorical variables we decided to use a Bar chart to best represent our data. The fill of the "Donation" variable allowed us to show the relationship between the variable and if they would make a donation or not.
+|       We had limitations in the data as some of the variables in the data were highly correlated to Donation. So we had to remove these variables from our main data set. To find these highly correlated variables we ran the findcorrelation function, and set the cutoff to .9.  We then ran a logistical regression and found the GVIF of each variable and ran another logistic regression with only the significant variables.. The rule that we used to determine multicollinearity was if the GVIF was over 5, the variable contained multicollinearity.  We then removed the variables with multiculinqrity we then used the function ovum.sample which can balance overfitted or under-fitted data. 
+
+|       When we achieved our balanced data set we then performed a training and testing split on the data so we could create our models with the testing data.Once we had our data down to the correct variables we were able to see that an optimal cutoff needed to be implemented. We experimented with .1 as the cutoff first and our sensitivity was at .0102 which was telling us that our model was not good at predicting the "yes" responses. We then changed our optimal cutoff to .51 which changed the sensitivity to .588 which gave us a better model.We created an LDA model in our case study which is a modeling technique that reduces the number of variables in our data set while keeping as much information as possible to find a linear combination to predict our categories. The LDA model gave us a sensitivity of .6393 and a specificity of .5276 which showed us that our model was more accurate at predicting “yes” responses. We also observed that our data for this model had an accuracy of .5838 which was slightly higher than that of the logistic regression model. Due to the limitation of not being able to implement an optimal cutoff for the LDA model the accuracy of this model could be seen as false. 
+
 
 
 
@@ -74,6 +78,7 @@ library(tinytex)
 library(corrplot)
 library(MASS)
 library(tidyverse)
+library(vip)
 library(esquisse)
 library(lubridate)
 library(modeldata)
@@ -181,26 +186,10 @@ summary(b1$Donation)
 ```
 
 
-```{r}
-set.seed(1)
-tr_ind = sample(nrow(b1),.8*nrow(b1), replace = F)
-b1train = b1[tr_ind,]
-b1test = b1[-tr_ind,]
-```
 
 
-```{r}
-a1 = glm(formula = Donation ~ . , data = b1 , family = binomial)
+### Balancing the data
 
-
-car::vif(a1)
-summary(a1)
-
-predprob = predict.glm(a1, newdata = b1test, type = "response")
-predclass_log = ifelse(predprob >= .05, "1", "0")
-caret::confusionMatrix(as.factor(predclass_log), as.factor(b1test$Donation), positive = "1")
-
-```
 
 ```{r}
 balancedb1 = ovun.sample(Donation~.,data= b1, seed=123, method= "over")$data
@@ -212,6 +201,23 @@ balancedb1 = ovun.sample(Donation~.,data= b1, seed=123, method= "over")$data
 ```{r}
 table(balancedb1$Donation)
 ```
+
+
+### Create a training and testing split
+
+```{r}
+set.seed(1)
+tr_ind = sample(nrow(balancedb1),.8*nrow(balancedb1), replace = F)
+b1train = balancedb1[tr_ind,]
+b1test = balancedb1[-tr_ind,]
+```
+
+
+
+\newpage
+
+### Creating graphic models of important variables
+
 
 
 ```{r}
@@ -270,6 +276,10 @@ balancedb1 %>%
 ```
 
 
+
+
+
+
 \newpage
 
 ## Results
@@ -277,10 +287,10 @@ balancedb1 %>%
 
 ### Logistic Regression
 
-|      Shows the accuracy that our logistic regression model has in predicting Yes and no Responses. The sensitivity of our model shows the accuracy we have for predicting "yes" responses and the specificity of our model shows the accuracy we have in predicting "no" responses. This model has an accuracy of 58.98%. We used .51 as our optimal cutoff point which gave us the best sensitivity and specificity which shows us that our model was accurate at predicting both yes and no responses.
+|      Shows the accuracy that our logistic regression model has in predicting Yes and no Responses. The sensitivity of our model shows the accuracy we have for predicting "yes" responses and the specificity of our model shows the accuracy we have in predicting "no" responses. This model has an accuracy of 58.28%. We used .51 as our optimal cutoff point which gave us the best sensitivity and specificity which shows us that our model was accurate at predicting both yes and no responses.
 
 ```{r}
-a1 = glm(formula = Donation ~ NeighborhoodCode + PercJapa + PercChin + AvgRent + IC3H + LFAF + MaxDol + LastDol, data = balancedb1 , family = binomial)
+a1 = glm(formula = Donation ~ NeighborhoodCode + PercJapa + PercChin + AvgRent + IC3H + LFAF + MaxDol + LastDol, data = b1test , family = binomial)
 
 
 car::vif(a1)
@@ -295,7 +305,7 @@ caret::confusionMatrix(as.factor(predclass_log), as.factor(b1test$Donation), pos
 
 
 ```{r}
-optim_threshold(a1,balancedb1, balancedb1$Donation)
+optim_threshold(a1,b1test, b1test$Donation)
 ```
 
 
@@ -317,30 +327,34 @@ car::vif(m2.log)
 
 
 
-```{r}
-rftrain =randomForest(Donation~NeighborhoodCode + PercJapa + PercChin + AvgRent + IC3H + LFAF + MaxDol + LastDol, data = balancedb1)
-```
-
-```{r}
-confusionMatrix(predict(rftrain,b1test), b1test$Donation, positive = '1')
-```
-
-
 
 ### LDA Model
 
+|       Shows the accuracy that our  LDA model has in predicting Yes and no Responses. This model is 58.38% accurate. The LDA model shows us a higher accuracy but due to the fact that we were not able to implent an optimal cutoff for the LDA model. This accuracy could be seen as false because the sensitivity and specificity are still lower that the logistic regression model. 
+
 
 ```{r}
-m1.lda = lda(formula = as.factor(Donation) ~ NeighborhoodCode + PercJapa + PercChin + AvgRent + IC3H + LFAF + MaxDol + LastDol, data = balancedb1)
+m1.lda = lda(formula = as.factor(Donation) ~ NeighborhoodCode + PercJapa + PercChin + AvgRent + IC3H + LFAF + MaxDol + LastDol, data = b1test)
 predclass_lda = predict(m1.lda, newdata = b1test)
 caret::confusionMatrix(as.factor(predclass_lda$class),as.factor(b1test$Donation), positive = "1") 
 ```
 
 
+### Random Forest 
 
+```{r}
+
+```
+
+
+
+
+
+\newpage
 
 ### Decision Tree
 
+|       Shows the accuracy that our  Decision Tree has in predicting Yes and no Responses. This model is 55.06% accurate. The Decision Tree model shows us a lower accuracy than the other two models but it is able to break down the variables  and show us the importance of each variable ranked.It also holds a sensitivity of 96.97% which shows that our model can predict "yes" responses but is relatively bad at predicting "no" responses.
 
 ```{r}
 library(rpart.plot)
@@ -366,6 +380,10 @@ pred_b1tree = predict(tree.b1train, newdata = b1test, type = "class")
 confusionMatrix(b1test$Donation, pred_b1tree)
 ```
 
+### Using VIP function to plot important variables
+```{r}
+vip(tree.b1train)
+```
 
 
 
